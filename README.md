@@ -9,7 +9,7 @@ var iwa = open("isolated-app://<IWA_ID>");
 
 That capability is now blocked, see [window.open("isolated-app://<ID>") is blocked](https://issues.chromium.org/issues/339994757#comment6)
 
-> This is a side effect of crrev.com/c/5466063, but is the intended behavior.
+> This is a side effect of [crrev.com/c/5466063](https://chromium-review.googlesource.com/c/chromium/src/+/5466063), but is the intended behavior.
 > 
 > ...
 
