@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "allow"
+    },
+    "condition": {
+      "urlFilter": "TCPServerSocket",
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "other",
+        "xmlhttprequest"
+      ]
+    }
+  }
+]

@@ -1,0 +1,38 @@
+{
+  "name": "IWA Utilities",
+  "manifest_version": 3,
+  "version": "1.0",
+  "description": "Get chrome://web-app-internals JSON, launch Isolated Web App from Web and chrome: URL's",
+  "declarative_net_request": {
+    "rule_resources": [{
+      "id": "iwa-rules",
+      "enabled": true,
+      "path": "iwa-rules.json"
+    }]
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "windows",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "declarativeNetRequestWithHostAccess",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "chrome://*/*",
+    "file://*/*",
+    "*://*/*"
+  ],
+  "web_accessible_resources": [{
+    "resources": ["*.html"],
+    "matches": ["<all_urls>"],
+    "extensions": []
+  }],
+  "author": "guest271314"
+}
