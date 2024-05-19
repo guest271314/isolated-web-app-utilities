@@ -1,5 +1,4 @@
 # isolated-web-app-utilities
-Isolated Web App Utilities
 
 This was recently not blocked on Chromium Developer Build and Chrome-For-Testing when called from DevTools `console` and Snippets
 
