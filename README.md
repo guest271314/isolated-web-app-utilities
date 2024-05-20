@@ -24,7 +24,7 @@ So far opening IWA windows including the following approaches that discretely wo
 - Network request including name of IWA or other string in URL.
 
 ### Utilities 
-AFAIK no (extension or other) API exists to get installed Isolated Web App details programmatically. `getWebAppInternalsDetails()` in `background.js` gets installed Isolated Web App details from the JSON in `chrome://web-app-internal`. 
+AFAIK no extension or other API exists to get installed Isolated Web App details programmatically. `getWebAppInternalsDetails()` in `background.js` gets installed Isolated Web App details from the JSON in `chrome://web-app-internals`. 
 
 ### Installation
 
