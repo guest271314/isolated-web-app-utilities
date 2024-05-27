@@ -65,7 +65,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, { title, url }, tab) => {
       );
       console.log(window);
     }
-    if (title?.includes("?sdp=")) {
+    if (title?.includes("?sdp=") && !tab.url.startsWith("isolated-app:")) {
       console.log(tab.url);
       const re = /\?sdp=.+/;
       const webAppDetails = await getWebAppInternalsDetails();
