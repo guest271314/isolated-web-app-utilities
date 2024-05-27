@@ -54,8 +54,8 @@ Using `web_accessible_resource` and a global function injected into the tab with
 
 ```
 const params = new URLSearchParams();
-params.append("name", "Signed Web Bundle in Isolated Web App");
-params.append("sdp", btoa(local.localDescription.sdp));
+params.set("sdp", btoa(local.localDescription.sdp));
+params.set("name", "Signed Web Bundle in Isolated Web App");
 openIsolatedWebApp(`?${params.toString()}`);
 ```
 
