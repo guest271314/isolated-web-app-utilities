@@ -93,8 +93,7 @@ chrome.runtime.onInstalled.addListener(async (reason) => {
 // Get wet-app-internals JSON
 // Inject extension ID into all Web pages for web_accessible_resources request
 // Get injected extension extension ID in Web page, delete private origin file
-Promise.all([
-  chrome.scripting.unregisterContentScripts(),
+chrome.scripting.unregisterContentScripts().then(() =>
   chrome.scripting
     .registerContentScripts([{
       id: "get-iwa-details",
@@ -116,8 +115,8 @@ Promise.all([
       matches: ["<all_urls>", "chrome://*/*"],
       world: "MAIN",
       runAt: "document_idle",
-    }]),
-]).catch((e) => console.error(chrome.runtime.lastError, e));
+    }])
+).catch((e) => console.error(chrome.runtime.lastError, e));
 
 // Open IWA window
 async function openIsolatedWebApp(
