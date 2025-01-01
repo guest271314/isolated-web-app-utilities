@@ -20,7 +20,7 @@ So far opening IWA windows including the following approaches that discretely wo
 - Handle `web_accessible_resources` `iframe` request
 - Handle `fetch()` request - from/to the current Web page, excluding `chrome:`.
 - Handle `document.title` update.
-- Get `chrome://wet-app-internals` JSON to filter IWA by `!name` and get `start_url`. Inject extension ID into all Web pages for `web_accessible_resources` request. Get injected extension extension ID in Web page, delete private origin file.
+- Get `chrome://web-app-internals` JSON to filter IWA by `!name` and get `start_url`. Inject extension ID into all Web pages for `web_accessible_resources` request. Get injected extension extension ID in Web page, delete private origin file.
 - Network request including name of IWA or other string in URL.
 
 ### Utilities 
