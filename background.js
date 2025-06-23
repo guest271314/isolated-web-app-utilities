@@ -130,7 +130,7 @@ async function openIsolatedWebApp(
       webapp["!name"] === isolatedWebAppName
     )
       .start_url;
-    return await chrome.windows.create({
+    const window = await chrome.windows.create({
       url: `${url}${detail}`,
       height: 0,
       width: 0,
@@ -139,6 +139,14 @@ async function openIsolatedWebApp(
       focused: false,
       type: "normal",
     });
+    // Update IWA URL after creation to include SDP
+    // https://issues.chromium.org/issues/426833112
+    const tab = await chrome.tabs.update(window.tabs[0].id, {
+      url: `${url}${detail}`,
+    });
+
+    return window;
+                                         
   } catch (e) {
     console.error(chrome.runtime.lastError, e);
   }
