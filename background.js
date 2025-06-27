@@ -19,7 +19,7 @@ self.addEventListener("fetch", async (event) => {
         webAppDetails,
         entries.get("name"),
       );
-      console.log(window);
+      console.log(event.request, window);
     }
   } catch (e) {
     console.error(chrome.runtime.lastError, e);
@@ -63,7 +63,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, { title, url }, tab) => {
         webAppDetails,
         "TCPServerSocket",
       );
-      console.log(window);
     }
     if (title?.includes("?sdp=") && !tab.url.startsWith("isolated-app:")) {
       console.log(tab.url);
@@ -76,10 +75,21 @@ chrome.tabs.onUpdated.addListener(async (tabId, { title, url }, tab) => {
         "Signed Web Bundle in Isolated Web App",
         sdp,
       );
-      console.log(window);
+    }
+    if (
+      title?.includes("TCPSocket") &&
+      !tab.url.startsWith("isolated-app:")
+    ) {
+      console.log(tab.url);
+      const webAppDetails = await getWebAppInternalsDetails();
+      console.log(webAppDetails);
+      const window = await openIsolatedWebApp(
+        webAppDetails,
+        "TCPSocket"
+      );
     }
     if (url?.includes("isolated-app")) {
-      console.log(tab.url);
+      console.log(tab.url, window);
     }
   } catch (e) {
     console.log(chrome.runtime.lastError, e);
@@ -139,14 +149,14 @@ async function openIsolatedWebApp(
       focused: false,
       type: "normal",
     });
-    // Update IWA URL after creation to include SDP
-    // https://issues.chromium.org/issues/426833112
-    const tab = await chrome.tabs.update(window.tabs[0].id, {
-      url: `${url}${detail}`,
-    });
-
-    return window;
-                                         
+    if (isolatedWebAppName === "Signed Web Bundle in Isolated Web App") {
+      // Update IWA URL after creation to include SDP
+      // https://issues.chromium.org/issues/426833112
+      const tab = await chrome.tabs.update(window.tabs[0].id, {
+        url: `${url}${detail}`,
+      });
+    }
+    return window;                                        
   } catch (e) {
     console.error(chrome.runtime.lastError, e);
   }
