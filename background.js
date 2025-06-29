@@ -55,11 +55,12 @@ chrome.declarativeNetRequest.onRuleMatchedDebug.addListener(
 // Handle document.title update
 chrome.tabs.onUpdated.addListener(async (tabId, { title, url }, tab) => {
   try {
+    let window = void 0;
     if (title?.includes("?name=TCPServerSocket")) {
       console.log(tab.url, title);
       const webAppDetails = await getWebAppInternalsDetails();
       console.log(webAppDetails);
-      const window = await openIsolatedWebApp(
+      window = await openIsolatedWebApp(
         webAppDetails,
         "TCPServerSocket",
       );
@@ -70,7 +71,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, { title, url }, tab) => {
       const webAppDetails = await getWebAppInternalsDetails();
       console.log(webAppDetails);
       const [sdp] = title.match(re);
-      const window = await openIsolatedWebApp(
+      window = await openIsolatedWebApp(
         webAppDetails,
         "Signed Web Bundle in Isolated Web App",
         sdp,
@@ -83,7 +84,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, { title, url }, tab) => {
       console.log(tab.url);
       const webAppDetails = await getWebAppInternalsDetails();
       console.log(webAppDetails);
-      const window = await openIsolatedWebApp(
+      window = await openIsolatedWebApp(
         webAppDetails,
         "TCPSocket"
       );
