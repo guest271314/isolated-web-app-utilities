@@ -1,6 +1,6 @@
 (async () => {
   const context = !!(chrome?.extension || chrome?.scripting);
-  // console.log(context ? "ISOLATED" : "MAIN");
+  console.log(context ? "ISOLATED" : "MAIN");
   try {
     const dir = await navigator.storage.getDirectory();
     const handle = await dir.getFileHandle("id", { create: context });
@@ -12,16 +12,19 @@
       const file = await handle.getFile();
       const id = await file.text();
       await dir.removeEntry(handle.name);
-      globalThis.openIsolatedWebApp = (iwaDetails) => {
+      globalThis.openIsolatedWebApp = async (iwaDetails) => {
         const src = `chrome-extension://${id}/index.html${iwaDetails}`;
         const iframe = document.createElement("iframe");
         iframe.style.display = "none";
         document.body.appendChild(iframe);
+        const { resolve, promise } = Promise.withResolvers();
         iframe.onload = (e) => {
           console.log(e);
           iframe.remove();
+          resolve();
         };
         iframe.src = src;
+        return promise;
       };
       console.log("openIsolatedWebApp() declared");
     }
