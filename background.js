@@ -106,12 +106,15 @@ chrome.runtime.onInstalled.addListener(async (reason) => {
 // Get injected extension extension ID in Web page, delete private origin file
 chrome.scripting.unregisterContentScripts().then(() =>
   chrome.scripting
-    .registerContentScripts([{
+    .registerContentScripts([
       id: "get-iwa-details",
       js: ["get-web-app-internals-json.js"],
-      persistAcrossSessions: false,
       matches: ["chrome://web-app-internals/*"],
+      persistAcrossSessions: true,
+      matchOriginAsFallback: true,
+      allFrames: true,
       runAt: "document_idle",
+      world: "ISOLATED"
     }, {
       id: "set-extension-id",
       js: ["get-extension-id.js"],
@@ -165,6 +168,7 @@ async function openIsolatedWebApp(
 
 // Get chrome://web-app-internals JSON
 async function getWebAppInternalsDetails() {
+  console.log("getWebAppInternalsDetails");
   try {
     const { id, tabs: [{ id: tabId }] } = await chrome.windows.create({
       url: "chrome://web-app-internals",
@@ -173,11 +177,14 @@ async function getWebAppInternalsDetails() {
     });
     const { resolve, promise } = Promise.withResolvers();
     const handleMessage = async (message) => {
+      console.log(message, id);
+      await chrome.windows.remove(id);
       resolve(message);
       chrome.runtime.onMessage.removeListener(handleMessage);
-      await chrome.windows.remove(id);
+      return true;
     };
     chrome.runtime.onMessage.addListener(handleMessage);
+
     const result = await promise;
     const { InstalledWebApps: { Details } } = result.find((
       { InstalledWebApps },
