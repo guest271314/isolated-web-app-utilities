@@ -1,5 +1,25 @@
+addEventListener("install", async (e) => {
+  console.log(e.type);
+  e.addRoutes({
+    condition: {
+      urlPattern: new URLPattern({ hostname: "*" }),
+    },
+    source: "fetch-event",
+  });
+  e.waitUntil(self.skipWaiting());
+});
+
+addEventListener("activate", async (e) => {
+  console.log(e.type);
+  e.waitUntil(self.clients.claim());
+});
+
+addEventListener("message", async (e) => {
+  console.log(e.type, e.data);
+});
 // Handle web_accessible_resources iframe request
-self.addEventListener("fetch", async (event) => {
+addEventListener("fetch", async (event) => {
+  console.log(event);
   try {
     const requestUrl = new URL(event.request.url);
     const entries = requestUrl.searchParams;
@@ -13,6 +33,7 @@ self.addEventListener("fetch", async (event) => {
       );
     }
     if (!entries.has("sdp")) {
+      event.respondWith(new Response(event.request.url));
       const webAppDetails = await getWebAppInternalsDetails();
       console.log(webAppDetails);
       const window = await openIsolatedWebApp(
@@ -21,6 +42,7 @@ self.addEventListener("fetch", async (event) => {
       );
       console.log(event.request, window);
     }
+    
   } catch (e) {
     console.error(chrome.runtime.lastError, e);
   }
@@ -106,14 +128,14 @@ chrome.runtime.onInstalled.addListener(async (reason) => {
 // Get injected extension extension ID in Web page, delete private origin file
 chrome.scripting.unregisterContentScripts().then(() =>
   chrome.scripting
-    .registerContentScripts([
+    .registerContentScripts([{
       id: "get-iwa-details",
       js: ["get-web-app-internals-json.js"],
       matches: ["chrome://web-app-internals/*"],
       persistAcrossSessions: true,
       matchOriginAsFallback: true,
       allFrames: true,
-      runAt: "document_idle",
+      runAt: "document_start",
       world: "ISOLATED"
     }, {
       id: "set-extension-id",
@@ -144,6 +166,7 @@ async function openIsolatedWebApp(
       webapp["!name"] === isolatedWebAppName
     )
       .start_url;
+    
     const window = await chrome.windows.create({
       url: `${url}${detail}`,
       height: 0,
@@ -153,6 +176,16 @@ async function openIsolatedWebApp(
       focused: false,
       type: "normal",
     });
+    if (isolatedWebAppName === "TCPServerSocket") {
+      async function handleRemove(id) {
+        console.log(window, id);
+        if (id === window.id) {
+          console.log(window);
+          chrome.windows.onRemoved.removeListener(handleRemove);
+        }
+      }
+      chrome.windows.onRemoved.addListener(handleRemove);
+    }
     if (isolatedWebAppName === "Signed Web Bundle in Isolated Web App") {
       // Update IWA URL after creation to include SDP
       // https://issues.chromium.org/issues/426833112
@@ -160,6 +193,7 @@ async function openIsolatedWebApp(
         url: `${url}${detail}`,
       });
     }
+    
     return window;                                        
   } catch (e) {
     console.error(chrome.runtime.lastError, e);
@@ -176,7 +210,7 @@ async function getWebAppInternalsDetails() {
       focused: false,
     });
     const { resolve, promise } = Promise.withResolvers();
-    const handleMessage = async (message) => {
+    async function handleMessage(message) {
       console.log(message, id);
       await chrome.windows.remove(id);
       resolve(message);
