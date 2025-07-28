@@ -53,10 +53,7 @@ IWA window launched in `tabs.onUpdated` event handler.
 Using `web_accessible_resource` and a global function injected into the tab with dynamic content scripts appends an `iframe` with `src` set to a `chrome-extension:` URL to the current `document` which makes a request that is intercepted by `onfetch` event handler in MV3 `ServiceWorker`
 
 ```
-const params = new URLSearchParams();
-params.set("sdp", btoa(local.localDescription.sdp));
-params.set("name", "Signed Web Bundle in Isolated Web App");
-openIsolatedWebApp(`?${params.toString()}`);
+await openIsolatedWebApp(`?name=TCPServerSocket`);
 ```
 
 #### Network request intercepted by `declarativeNetRequest` rules
