@@ -178,6 +178,7 @@ async function openIsolatedWebApp(
       type: "normal",
     });
     if (isolatedWebAppName === "TCPServerSocket") {
+      /*
       globalThis.nativeMessagingPort = chrome.runtime.connectNative(
         "sockets",
       );
@@ -187,11 +188,12 @@ async function openIsolatedWebApp(
         }
         console.log(port);
       });
+      */
       async function handleRemove(id) {
         // console.log(window, id);
         if (id === window.id) {
           // console.log(window);
-          globalThis.nativeMessagingPort.disconnect();
+          // globalThis.nativeMessagingPort.disconnect();
           chrome.windows.onRemoved.removeListener(handleRemove);
         }
       }
