@@ -226,7 +226,7 @@ async function getWebAppInternalsDetails() {
       const [tab] = await chrome.tabs.query({ active: true });
       const { resolve, promise } = Promise.withResolvers();
       async function handleMessage(message) {
-        console.log(message, id);
+        // console.log(message, id);
         await chrome.windows.remove(id);
         resolve(message);
         chrome.runtime.onMessage.removeListener(handleMessage);
