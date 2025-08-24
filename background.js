@@ -217,7 +217,7 @@ async function getWebAppInternalsDetails() {
   let Details;
   try {
     const dir = await navigator.storage.getDirectory();
-    Details = await dir.getFileHandle("webapp-internals.json")
+    Details = await dir.getFileHandle("web-app-internals.json")
       .then((handle) =>
         handle.getFile().then((file) => new Response(file).json())
       )
@@ -242,7 +242,7 @@ async function getWebAppInternalsDetails() {
       ({ InstalledWebApps: { Details } } = result.find((
         { InstalledWebApps },
       ) => InstalledWebApps));
-      const handle = await dir.getFileHandle("webapp-internals.json", {
+      const handle = await dir.getFileHandle("web-app-internals.json", {
         create: true,
       });
       const writable = await handle.createWritable();
