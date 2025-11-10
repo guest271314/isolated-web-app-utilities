@@ -1,3 +1,7 @@
+const { readable, writable } = new TransformStream();
+const reader = readable.getReader();
+const writer = writable.getWriter();
+
 addEventListener("install", async (e) => {
   console.log(e.type);
   e.addRoutes({
@@ -20,33 +24,36 @@ addEventListener("message", async (e) => {
 // Handle web_accessible_resources iframe request
 self.addEventListener("fetch", async (event) => {
   // console.log(event);
-  event.respondWith((async () => {
-    try {
-      const requestUrl = new URL(event.request.url);
-      const entries = requestUrl.searchParams;
-      if (entries.has("sdp")) {
-        const webAppDetails = await getWebAppInternalsDetails();
-        console.log(webAppDetails);
-        const window = await openIsolatedWebApp(
-          webAppDetails,
-          entries.get("name"),
-          `?${entries.toString()}`,
-        );
-      }
-      if (!entries.has("sdp")) {
-        const webAppDetails = await getWebAppInternalsDetails();
-        // console.log(webAppDetails);
-        const window = await openIsolatedWebApp(
-          webAppDetails,
-          entries.get("name"),
-        );
-        // console.log(event.request, window);
-      }
-    } catch (e) {
-      console.error(chrome.runtime.lastError, e);
+  try {
+    const requestUrl = new URL(event.request.url);
+    const entries = requestUrl.searchParams;
+    if (requestUrl.href.includes("Details")) {
+      writer.write(entries.get("Details"));
+      event.respondWith(new Response("ok"));
+      return;
     }
-    return fetch(event.request);
-  })());
+    if (entries.has("sdp")) {
+      const webAppDetails = await getWebAppInternalsDetails();
+      console.log(webAppDetails);
+      const window = await openIsolatedWebApp(
+        webAppDetails,
+        entries.get("name"),
+        `?${entries.toString()}`,
+      );
+    }
+    if (!entries.has("sdp")) {
+      event.respondWith(new Response(event.request.url));
+      const webAppDetails = await getWebAppInternalsDetails();
+      console.log(webAppDetails);
+      const window = await openIsolatedWebApp(
+        webAppDetails,
+        entries.get("name"),
+      );
+      console.log(event.request, window);
+    }
+  } catch (e) {
+    console.error(chrome.runtime.lastError, e);
+  }
 });
 
 // Handle fetch() request - from/to the current Web page, excluding chrome:
@@ -225,32 +232,20 @@ async function getWebAppInternalsDetails() {
       )
       .catch((e) => e.name);
     if (Details === "NotFoundError") {
-      const [tab] = await chrome.tabs.query({ active: true });
-      const { resolve, promise } = Promise.withResolvers();
-      async function handleMessage(message) {
-        // console.log(message, id);
-        await chrome.windows.remove(id);
-        resolve(message);
-        chrome.runtime.onMessage.removeListener(handleMessage);
-        return true;
-      }
-      chrome.runtime.onMessage.addListener(handleMessage);
       const { id, tabs: [{ id: tabId }] } = await chrome.windows.create({
         url: "chrome://web-app-internals",
         state: "minimized",
         focused: false,
       });
-      const result = await promise;
-      ({ InstalledWebApps: { Details } } = result.find((
-        { InstalledWebApps },
-      ) => InstalledWebApps));
-      const handle = await dir.getFileHandle("web-app-internals.json", {
+      Details = JSON.parse((await reader.read()).value);
+      await chrome.windows.remove(id);
+      const handle = await dir.getFileHandle("webapp-internals.json", {
         create: true,
       });
-      const writable = await handle.createWritable();
+      const writableFileStream = await handle.createWritable();
       await new Blob([JSON.stringify(Details)], {
         type: "application/json",
-      }).stream().pipeTo(writable);
+      }).stream().pipeTo(writableFileStream);
     }
     return Details;
   } catch (e) {
