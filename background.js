@@ -177,8 +177,8 @@ async function openIsolatedWebApp(
 
     const window = await chrome.windows.create({
       url: `${url}${detail}`,
-      height: 0,
-      width: 0,
+      height: 100,
+      width: 100,
       left: 0,
       top: 0,
       focused: false,
