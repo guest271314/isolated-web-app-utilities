@@ -2,9 +2,7 @@ onload = async () => {
   let Details;
   let text = document.querySelector("body > web-app-internals-app")
     .shadowRoot.getElementById("json").textContent;
-  ({ InstalledWebApps: { Details } } = JSON.parse(text).find((
-    { InstalledWebApps },
-  ) => InstalledWebApps));
+  ({ InstalledWebApps: { Details } } = JSON.parse(text));
   Details = Details
     .map((InstalledWebApps) => ({
       "!app_id": InstalledWebApps["!app_id"],
