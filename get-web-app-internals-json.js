@@ -1,4 +1,5 @@
 onload = async () => {
+  await scheduler.postTask(() => {}, {delay:2000});
   let Details;
   let text = document.querySelector("body > web-app-internals-app")
     .shadowRoot.getElementById("json").textContent;
