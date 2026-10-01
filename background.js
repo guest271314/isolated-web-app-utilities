@@ -186,6 +186,9 @@ async function openIsolatedWebApp(
     });
     if (isolatedWebAppName === "TCPServerSocket") {
       /*
+      if (globalThis.nativeMessagingPort !== undefined && Object.hasOwn(globalThis.nativeMessagingPort, "disconnect")) {
+        globalThis.nativeMessagingPort.disconnect();
+      }
       globalThis.nativeMessagingPort = chrome.runtime.connectNative(
         "sockets",
       );
@@ -197,9 +200,9 @@ async function openIsolatedWebApp(
       });
       */
       async function handleRemove(id) {
-        // console.log(window, id);
+        console.log(window, id);
         if (id === window.id) {
-          // console.log(window);
+          console.log(window);
           // globalThis.nativeMessagingPort.disconnect();
           chrome.windows.onRemoved.removeListener(handleRemove);
         }
