@@ -1,6 +1,7 @@
 onload = async () => {
   let Details;
-  const text = document.getElementById("json").textContent;
+  let text = document.querySelector("body > web-app-internals-app")
+    .shadowRoot.getElementById("json").textContent;
   ({ InstalledWebApps: { Details } } = JSON.parse(text).find((
     { InstalledWebApps },
   ) => InstalledWebApps));
